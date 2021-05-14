@@ -1,42 +1,40 @@
 from random import randint
+from House import House
 
 
 class Man:
     def __init__(self, name):
         self.name = name
-        self.food = 20
-        self.money = 50
         self.fullnes = 50
         self.house = None
 
     def __str__(self):
-        return '{} голод:{} еда: {} деньги: {}'.format(self.name, self.fullnes, self.food, self.money)
+        return '{} голод:{}'.format(self.name, self.fullnes)
 
     def eat(self):
-        if self.food >= 10:
-            self.food -= 10
+        if self.house.food >= 10:
+            self.house.food -= 10
             self.fullnes += 10
             print('{0} покушал'.format(self.name))
         else:
-            print('У {0} недостаточно еды нужно ещё {1}'.format(self.name, 10 - self.food))
-            print('У {0} недостаточно еды нужно ещё {1}'.format(self.name, 10 - self.food))
+            print('У {0} недостаточно еды нужно ещё {1}'.format(self.name, 10 - self.house.food))
 
     def work(self):
         print('{} сходил на работу'.format(self.name))
-        self.money += 50
+        self.house.money += 50
         self.fullnes -= 20
 
-    def play_game(self):
-        print('{} поиграл'.format(self.name))
+    def watch_tv(self):
+        print('{} посмотрел телевизор'.format(self.name))
         self.fullnes -= 20
 
     def buy_food(self):
-        if self.money < 30:
+        if self.house.money < 30:
             print('{} денег нет!'.format(self.name))
         else:
             print('{} купил еды'.format(self.name))
-            self.money -= 30
-            self.food += 30
+            self.house.money -= 30
+            self.house.food += 30
 
     def act(self):
         if self.fullnes < 0:
@@ -45,16 +43,18 @@ class Man:
         dice = randint(1, 6)
         if self.fullnes <= 20:
             self.eat()
-        elif self.food <= 10:
+            if self.house.food <= 10:
+                self.buy_food()
+        elif self.house.food <= 10:
             self.buy_food()
-        elif self.money <= 30:
+        elif self.house.money <= 30:
             self.work()
         elif dice == 1:
             self.work()
         elif dice == 2:
             self.eat()
         else:
-            self.play_game()
+            self.watch_tv()
 
     def enter_house(self, house):
         self.house = house
