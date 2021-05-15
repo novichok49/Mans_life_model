@@ -1,62 +1,76 @@
 from random import randint
-from House import House
+
+FULLNES_SPENDS = {"work": 20,
+                  "watch_tv": 10,
+                  "enter_house": 10}
+FULLNES_FILL = 20
+
+FOOD_SPENDS = 20
+FOOD_FILL = 20
+
+MONEY_SPENDS = 20
+MONEY_FILL = 20
 
 
 class Man:
-    def __init__(self, name):
+    def __init__(self, name, start_fullnes=50, house=None):
         self.name = name
-        self.fullnes = 50
-        self.house = None
+        self.fullnes = start_fullnes
+        self.house = house
 
     def __str__(self):
         return '{} голод:{}'.format(self.name, self.fullnes)
 
     def eat(self):
-        if self.house.food >= 10:
-            self.house.food -= 10
-            self.fullnes += 10
-            print('{0} покушал'.format(self.name))
+        if self.house.food - FOOD_SPENDS >= 0:
+            self.house.food -= FOOD_SPENDS
+            self.fullnes += FULLNES_FILL
+            print('{} покушал'.format(self.name))
         else:
-            print('У {0} недостаточно еды нужно ещё {1}'.format(self.name, 10 - self.house.food))
+            print('Еды нет!!!')
 
     def work(self):
+        self.house.money += MONEY_FILL
+        self.fullnes -= FULLNES_SPENDS["work"]
         print('{} сходил на работу'.format(self.name))
-        self.house.money += 50
-        self.fullnes -= 20
 
     def watch_tv(self):
-        print('{} посмотрел телевизор'.format(self.name))
-        self.fullnes -= 20
+        print('{} смотрел телевизор весь день'.format(self.name))
+        self.fullnes -= FULLNES_SPENDS["watch_tv"]
 
     def buy_food(self):
-        if self.house.money < 30:
-            print('{} денег нет!'.format(self.name))
-        else:
+        if self.house.money - MONEY_SPENDS >= 0:
+            self.house.money -= MONEY_SPENDS
+            self.house.food += FOOD_FILL
             print('{} купил еды'.format(self.name))
-            self.house.money -= 30
-            self.house.food += 30
+        else:
+            print('Денег нет!!!')
 
     def act(self):
         if self.fullnes < 0:
-            print('{} умер'.format(self.name))
+            print('{} умер от голода!'.format(self.name))
             return
-        dice = randint(1, 6)
-        if self.fullnes <= 20:
-            self.eat()
-            if self.house.food <= 10:
-                self.buy_food()
-        elif self.house.food <= 10:
-            self.buy_food()
-        elif self.house.money <= 30:
-            self.work()
-        elif dice == 1:
-            self.work()
-        elif dice == 2:
-            self.eat()
+        if self.fullnes < max(FULLNES_SPENDS.values()):
+            if self.house.food < FOOD_SPENDS:
+                print('{} видит, что мало еды в холодильнике и хочет сходить в магазин'.format(self.name))
+                if self.house.money < MONEY_SPENDS:
+                    print('{} видит, что мало денег и идёт работать'.format(self.name))
+                    self.work()
+                    self.buy_food()
+                    self.eat()
+                else:
+                    self.buy_food()
+                    self.eat()
+            else:
+                self.eat()
         else:
-            self.watch_tv()
+            dice = randint(1, 6)
+            if dice == 1:
+                self.work()
+            else:
+                self.watch_tv()
 
     def enter_house(self, house):
         self.house = house
-        self.fullnes -= 10
+        self.fullnes -= FULLNES_SPENDS["enter_house"]
         print('{} заехал в дом'.format(self.name))
